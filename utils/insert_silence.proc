@@ -1,0 +1,85 @@
+# Insert an amount of silence into a file at a given time
+procedure insert_silence: .sound_name$, .split_time, .silence_duration
+	# pre silence portion
+	@extract_before: .sound_name$, .split_time
+	.part1_obj_no = extract_before.obj_no
+
+	# silence portion
+	@describe_sound: .sound_name$
+	@create_silence: "silence", describe_sound.channels, .silence_duration, describe_sound.sampling_frequency
+	.silence_obj_no = create_silence.silence_obj_no 
+
+	# post silence portion
+	@extract_after: .sound_name$, .split_time
+	.part2_obj_no = extract_after.obj_no	
+
+	# combine pieces into one sound, remove three portions
+	@saveSelection
+
+	selectObject(.part1_obj_no, .silence_obj_no, .part2_obj_no)
+	Concatenate
+	.combined_obj_no = selected()
+
+	# rename chain to source sound plus amount of silence
+	@extract_name_of_sound: .sound_name$
+	.new_name$ = extract_name_of_sound.name$ + "_" + string$(.silence_duration * 1000)
+	Rename: .new_name$	
+
+	selectObject(.part1_obj_no, .silence_obj_no, .part2_obj_no)
+	Remove
+
+	@restoreSelection
+endproc
+
+
+
+# Extract everything before some point
+procedure extract_before: .sound_name$, .split_time
+	@extract_default: .sound_name$, 0, .split_time
+	.obj_no = extract_default.obj_no
+endproc
+
+# Extract everything after some point
+procedure extract_after: .sound_name$, .split_time
+	@describe_sound: .sound_name$	
+	@extract_default: .sound_name$, .split_time, describe_sound.duration
+	.obj_no = extract_default.obj_no
+endproc
+
+# Extract procedure with defaults hard-coded
+procedure extract_default: .sound_name$, .start_time, .end_time
+	@saveSelection()
+	
+	selectObject: .sound_name$	
+	extracted = do("Extract part...", .start_time, .end_time, "rectangular", 1, "no")
+	.obj_no = selected()
+	
+	@restoreSelection()
+endproc
+
+
+
+procedure create_silence: .outname$, .channels, .duration, .sample
+	@saveSelection()
+	do("Create Sound from formula...", .outname$, .channels, 0, .duration, .sample, "0")
+	.silence_obj_no = selected()
+	@restoreSelection()
+endproc
+
+
+
+# Run/store multiple queries about a sound file
+procedure describe_sound: .sound_name$
+	@saveSelection()
+	selectObject: .sound_name$
+	.sampling_frequency = do("Get sampling frequency")
+	.duration = do("Get total duration")
+	.channels = do("Get number of channels")
+	@restoreSelection()
+endproc
+
+
+
+procedure extract_name_of_sound: .sound_name$
+	.name$ = extractWord$(.sound_name$, "Sound")
+endproc

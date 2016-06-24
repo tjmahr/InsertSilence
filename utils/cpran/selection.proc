@@ -1,0 +1,152 @@
+#! ---
+#! title:  'Lightweight procedures'
+#! author:
+#! - 'José Joaquín Atria'
+#! tags: [praat, cpran, selection]
+#! abstract: |
+#!   This is a set of procedure that make it easy to save and restore
+#!   any number of object selections, as well as perform other related
+#!   tasks (clear the selection, count types of objects, etc).
+#!
+#!   This script is part of the selection CPrAN plugin for Praat.
+#! ---
+#!
+#! These procedures do not use selection tables
+#!
+#! ## License
+#!
+#! This script is part of the selection CPrAN plugin for Praat.
+#! The latest version is available through CPrAN or at
+#! <http://cpran.net/plugins/selection>
+#!
+#! The selection plugin is free software: you can redistribute it
+#! and/or modify it under the terms of the GNU General Public
+#! License as published by the Free Software Foundation, either
+#! version 3 of the License, or (at your option) any later version.
+#!
+#! The selection plugin is distributed in the hope that it will be
+#! useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#! of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#! GNU General Public License for more details.
+#!
+#! You should have received a copy of the GNU General Public License
+#! along with selection. If not, see <http://www.gnu.org/licenses/>.
+#!
+#! Copyright 2014, 2015 Jose Joaquin Atria
+
+# Setting this variable to 0 makes the selection process much more
+# stringent.
+if !variableExists("selection.restore_nocheck")
+selection.restore_nocheck = 1
+endif
+
+#!
+#! ## Procedures
+#!
+
+## Selection tables
+
+#! ### `saveSelection` {#save-selection}
+#!
+#! ~~~ params
+#! out:
+#!   - .n: The total number of selected objects
+#!   - .id[]: >
+#!     An indexed variable with the ID numbers of each originally
+#!     selected object
+#! ~~~
+#!
+#! Save the active selection.
+#!
+#! The selection is saved in the internal indexed variable `.id[]`,
+#! which is accessed internally by [`restoreSelection()`]
+#! (#restore-selection) to restore this anonymous selection.
+#!
+#! Since the selection is _anonymous_, and not saved anywhere external,
+#! this selection is _extremely_ fragile. If there is _any_
+#! chance this procedure might be called again before the enxt call
+#! to [`restoreSelection()`](#restore-selection), then prefer
+#! [`saveSelectionTable()`](save-selection-table).
+#!
+procedure saveSelection ()
+.n = numberOfSelected()
+for .i to .n
+.id[.i] = selected(.i)
+endfor
+
+@restoreSelection()
+endproc
+
+
+#! ### `restoreSelection` {#restore-selection}
+#!
+#! ~~~ params
+#! selection:
+#!   out: true
+#! ~~~
+#!
+#! Restores the last selection saved by [`saveSelection`](#save-selection).
+#!
+#! Upon being called, this will restore the selection available in the
+#! internal variables of [`saveSelection`](#save-selection).
+#!
+procedure restoreSelection ()
+if variableExists("saveSelection.n")
+nocheck selectObject: undefined
+@plusSelection()
+else
+  exitScript: "No selection saved"
+endif
+endproc
+
+
+#! ### `plusSelection` {#plus-selection}
+#!
+#! ~~~ params
+#! selection:
+#!   out: true
+#! ~~~
+#!
+#! Adds the last selection saved by [`saveSelection()`](#save-selection)
+#! to the current selection.
+#!
+#! Similar to calling [`restoreSelection()](restore-selection), but the
+#! selection is not cleared first.
+#!
+procedure plusSelection ()
+if variableExists("saveSelection.n")
+for .i to saveSelection.n
+if selection.restore_nocheck
+nocheck plusObject: saveSelection.id[.i]
+else
+  plusObject: saveSelection.id[.i]
+endif
+endfor
+else
+  exitScript: "No selection saved"
+endif
+endproc
+
+#! ### `minusSelection` {#minus-selection}
+#!
+#! ~~~ params
+#! selection:
+#!   out: true
+#! ~~~
+#!
+#! Removes objects in the last selection saved by
+#! [`saveSelection()`](save-selection) from the current selection
+#!
+procedure minusSelection ()
+if variableExists("saveSelection.n")
+for .i to saveSelection.n
+if selection.restore_nocheck
+nocheck minusObject: saveSelection.id[.i]
+else
+  minusObject: saveSelection.id[.i]
+endif
+endfor
+else
+  exitScript: "No selection saved"
+endif
+endproc
