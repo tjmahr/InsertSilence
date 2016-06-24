@@ -1,0 +1,30 @@
+Praat Version: 6.0.19
+Date: Fri Jun 24 13:21:36 2016
+...2 files found
+Writing: wavs/20/Fin_hi_the_D_Duck_faci_20.wav
+Writing: wavs/20/Fin_hi_the_V_Duck_neut_20.wav
+
+Praat Version: 6.0.19
+Date: Fri Jun 24 13:21:36 2016
+...2 files found
+Writing: wavs/40/Fin_hi_the_D_Duck_faci_40.wav
+Writing: wavs/40/Fin_hi_the_V_Duck_neut_40.wav
+
+Praat Version: 6.0.19
+Date: Fri Jun 24 13:21:36 2016
+...2 files found
+Writing: wavs/60/Fin_hi_the_D_Duck_faci_60.wav
+Writing: wavs/60/Fin_hi_the_V_Duck_neut_60.wav
+
+Praat Version: 6.0.19
+Date: Fri Jun 24 13:21:36 2016
+...2 files found
+Writing: wavs/80/Fin_hi_the_D_Duck_faci_80.wav
+Writing: wavs/80/Fin_hi_the_V_Duck_neut_80.wav
+
+Praat Version: 6.0.19
+Date: Fri Jun 24 13:21:36 2016
+...2 files found
+Writing: wavs/100/Fin_hi_the_D_Duck_faci_100.wav
+Writing: wavs/100/Fin_hi_the_V_Duck_neut_100.wav
+
